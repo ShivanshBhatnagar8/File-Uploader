@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../style.css" />
+    <title>File Upload</title>
+  </head>
+  <body>
+    <% if (files.length!==0) {%> <% files.forEach((file) => { %>
+    <div class="file-container">
+      <p class="file-name"><strong>File Name: </strong><%= file.name %></p>
+      <p class="file-date">
+        <strong>Upload Date-Time: </strong> <%=
+        file.upload_time.toLocaleDateString() %>
+      </p>
+      <p class="folder-name">
+        <strong>FolderName: </strong> <%= file.folder.name %>
+      </p>
+      <!-- <a href="http://localhost:3000/files/download/<%= file.name%>"
+        >Download</a
+      > -->
+      <button id="<%= file.id%>" class="delete-file-btn">Delete File</button>
+      <p class="error"></p>
+    </div>
+    <% }); %> <%}%>
+    <script>
+      const deleteFileBtn = document.querySelectorAll(".delete-file-btn");
+      const error = document.querySelector(".error");
+      async function deleteFile(id) {
+        return await fetch("http://localhost:3000/files/delete", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            fileId: id,
+          }),
+        });
+      }
+
+      deleteFileBtn.forEach((el) => {
+        el.addEventListener("click", function (e) {
+          deleteFile(Number(e.currentTarget.id))
+            .then((response) => {
+              console.log(response);
+              if (response.status == 200) {
+                location.reload();
+              } else {
+                error.textContent = "Something Went wrong !";
+              }
+            })
+            .catch((error) => {
+              error.textContent = "Something Went wrong !";
+            });
+        });
+      });
+    </script>
+  </body>
+</html>
